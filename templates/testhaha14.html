@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="YiWen Tseng">
+        <title>W＆E＆T Dumbbell</title>
+
+        <!-- Bootstrap core CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdn.bootcss.com/socket.io/1.5.1/socket.io.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"></script>
+        
+        
+        <script>
+            
+            var reconnectTimeout = 2000;
+            const TOPIC = "Topic/UserID";
+            const Feedback_Topic = "Feedback/UserID_State";
+            var client = false;
+            
+            // 用戶端成功連接 broker 時...
+            function onConnect(){
+                // 確認連接後，才能訂閱主題
+                console.log("onConnect then subscribe topic");
+                client.subscribe(Feedback_Topic);
+            }
+            
+            // 收到訊息時...
+            function onMessageArrived(message){
+                console.log("onMessageArrived:"+message.payloadString);
+                
+                var json = JSON.parse(message.payloadString);
+                console.log(json)
+
+                //$("#UserID").html(json['UserID']);
+                //var userid = document.getElementById("UserID").innerHTML;
+                
+                alert("註冊成功！!");
+                document.getElementById("mqtt_monitor").innerHTML = message.payloadString;
+            }
+            
+            // 發佈訊息
+            function publish_message() {
+                var input_text = document.getElementById("mqtt_text");
+                var payload = input_text.value;
+                var message = new Paho.MQTT.Message(payload);
+                message.destinationName = TOPIC;
+                client.send(message);
+                input_text.value = '';
+            }
+            
+            function init() {
+                document.getElementById("mqtt_pub").addEventListener('click', publish_message);
+                // 建立 MQTT 用戶端實體. 你必須正確寫上你設置的埠號.
+                // ClientId 可以自行指定，提供 MQTT broker 認證用
+                client = new Paho.MQTT.Client("ws://172.20.10.3:9001/", "myClientId");
+
+                // 指定收到訊息時的處理動作
+                client.onMessageArrived = onMessageArrived;
+
+                // 連接 MQTT broker
+                client.connect({onSuccess:onConnect});
+            }
+
+            window.addEventListener('load', init, false);
+            //document.addEventListener('DOMContentLoaded', init, false);
+            
+            
+        </script> 
+        
+            
+           
+        <link rel="stylesheet" href="../static/css/album.css">
+		
+		
+		<link rel="stylesheet" href="{{url_for('static', filename='css/style.css') }}">
+		<!---<link rel="stylesheet" href="{{url_for('static', filename='css/necessary.css') }}">!--->
+	    <link rel="stylesheet" href="{{url_for('static', filename='css/clock_style.css') }}">
+	    <link rel="stylesheet" href="{{url_for('static', filename='css/album.css') }}">
+	    <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.css') }}">
+	    
+	    
+	    <style>
+            
+        .div_obj{
+                float:right; width:300px; height:300px; margin-right:-100px; margin-top: -320px;
+            }
+            
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+          }
+
+          @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+              font-size: 3.5rem;
+            }
+          }
+            
+        #card-img-overlay1{
+position: relative;
+background-repeat: no-repeat;
+background-size: contain;
+height: 470px;
+max-width: 303px;
+margin: 0 auto;
+top:-80px;
+left:-5px;
+ background-image: url({{ url_for('static', filename='Card_A.png') }});
+
+} 
+#card-img-overlay2{
+position: relative;
+background-repeat: no-repeat;
+background-size: contain;
+height: 470px;
+max-width: 303px;
+margin: 0 auto;
+top:-80px;
+left:-5px;
+ background-image: url({{ url_for('static', filename='Card_B.png') }});
+
+
+} 
+#card-img-overlay3{
+position: relative;
+background-repeat: no-repeat;
+background-size: contain;
+height: 470px;
+max-width: 303px;
+margin: 0 auto;
+top:-80px;
+left:-5px;
+ background-image: url({{ url_for('static', filename='Card_C.png') }});
+
+} 
+#card-img-overlay4{
+position: relative;
+background-repeat: no-repeat;
+background-size: contain;
+height: 470px;
+max-width: 303px;
+margin: 0 auto;
+top:-80px;
+left:-5px;
+ background-image: url({{ url_for('static', filename='Card_D.png') }});
+
+} 
+            
+   .album py-5{
+	height:100%;
+	width:100%;
+}
+.col-md-3 {
+background-repeat: no-repeat;
+background-size: contain;
+position: relative;
+align-content:center;
+top:100px;
+height: 100%;
+}
+
+.text-UserID {
+position: absolute;
+left: 105px;
+top: 52px;
+font-size:22px;
+}
+
+.text-frequency {
+position: absolute;
+left: 85px;
+top: 155px;
+font-size:26px;
+}
+
+.text-Acc{
+position:absolute;
+left:182px;
+top: 155px;
+font-size:26px;
+}
+.text-State{
+position:absolute;
+left:70px;
+top:242px;
+font-size:26px;
+			
+	}
+.controls{
+background-color:white;
+border:5px soild#999;
+width: 100%;
+left:350px;
+height:300px;
+			bottom:-110px;;
+}
+        .green{
+			width:83px;
+			height:83px;
+			position:absolute;
+			left:36px;
+			top:267px;
+			border-radius:50%;
+        }
+		.red_cc{
+			width:83px;
+			height:83px;
+			left:140px;
+			top:267px;
+			position:absolute;
+			border-radius:50%;
+		} 
+
+@media (min-width:768px){
+.text-UserID {
+	left:51px;
+	top:25px;
+	font-size:13px;
+}
+
+.text-frequency {
+	left:41px;
+	top: 79px;
+	font-size:13px;
+}
+
+.text-Acc{
+	left: 94px;
+	top: 79px;
+	font-size:13px;
+}
+.text-State{
+	position:absolute;
+	left:39px;
+	top:123px;
+	font-size:13px;
+}
+ 
+}
+@media (min-width:991px){
+.text-UserID {
+	
+	left:74px;
+	top:38px;
+	font-size:17px;
+	
+}
+
+.text-frequency {
+	left:59px;
+	top:109px;
+	font-size:22px;
+	
+}
+
+.text-Acc{
+	left:128px;
+	top:109px;
+	font-size: 22px;
+	
+}
+.text-State{
+	position:absolute;
+	left:42px;
+	top:170px;
+	 font-size:22px;
+}
+
+}
+@media (min-width:1200px){
+
+.text-UserID {
+	left:90px;
+	top:48px;
+	font-size:20px;
+}
+
+.text-frequency {
+	left:71px;
+	top:133px;
+	font-size:26px;
+}
+
+.text-Acc{
+	left:157px;
+	top:133px;
+	font-size:26px;
+}
+.text-State{
+	position:absolute;
+	left:52px;
+	top:208px;
+	font-size:26px;
+			
+}
+
+}
+.controls{
+	background-color:white;
+	border:5px soild#999;
+	height: 50px;
+	width: 100%;
+	left:350px;
+	top:-10px;
+
+}
+
+
+.form-signin {
+	width: 100%;
+	max-width: 330px;
+	padding: 15px;
+	margin: auto;
+  }
+
+  .form-signin .checkbox {
+	font-weight: 400;
+  }
+
+  .form-signin .form-control {
+	position: relative;
+	box-sizing: border-box;
+	height: auto;
+	padding: 10px;
+	font-size: 16px;
+  }
+
+  .form-signin .form-control:focus {
+	z-index: 2;
+  }
+
+  .form-signin input[type="email"] {
+	margin-bottom: -1px;
+	border-bottom-right-radius: 0;
+	border-bottom-left-radius: 0;
+  }
+  .form-signin input[type="password"] {
+	margin-bottom: 10px;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+  }
+
+        </style>
+	    
+    </head>
+
+    <body onload="ShowTime()" class="text-center">
+
+            <header>
+                <div class="navbar navbar-dark bg-dark shadow-sm">
+                    <div class="container d-flex justify-content-between">
+                        <a href="#" class="navbar-brand d-flex align-items-center text-center" style="margin:0px auto;">
+                            <strong>Wisdom ＆ Effective ＆ Training Dumbbell</strong>
+                        </a>
+
+                        <a href="#" class="navbar-brand d-flex align-items-center text-center" style="margin:0px auto;">
+                            <div id="showbox"></div>
+                        </a>
+
+
+                    </div>
+                </div>
+            </header>
+
+    <main role="main">
+            
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-3">
+                               
+                               <!---<img src="../static/Card_A.png" width="100%"  >!--->
+                                <div id="card-img-overlay1">
+									
+											<div class="text-UserID">
+												<span id="UserIDA">XXXXXX</span>
+											</div>
+
+											<div class="text-frequency">
+												<span id="frequencyA">0</span>
+											</div>
+
+											<div class="text-Acc">
+												<span id="AccA">0.XX</span>
+											</div>
+											<div class="text-State">
+												<span id="show_stateA"></span>
+											</div>
+											
+															
+										<!---<div class="green">
+                                            <div id="green1"></div>
+										</div>
+										
+								       <div class="red_cricle">
+                                           <div id="red1"></div>
+										</div>!--->
+										
+										
+								
+								<div class="red_cc">	                			                	
+				        <div align="left" id="red1" style="width: 83px;height: 83px;border-radius: 50%;background-color: #DDDDDD"></div>
+                        </div>	
+                        <div class="green">
+                        <div align="right"id="green1" style="width: 83px;height: 83px;border-radius: 50%;background-color: #DDDDDD"></div>	
+				   
+							</div>			
+
+				
+									
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                               
+                               <!---<img src="../static/Card_B.png" width="100%"  >!--->
+                                <div id="card-img-overlay2">
+				
+										<div class="text-UserID">
+											 <span id="UserIDB">XXXXXX</span>
+										</div>
+										<div class="text-frequency">
+											<span id="frequencyB">0</span>
+										</div>
+										<div class="text-Acc">
+											<span id="AccB">0.XX</span>
+										</div>
+										<div class="text-State">
+											<span id="show_stateB"></span>
+										</div>
+										
+										<!---<div class="green">
+                                            <div id="green2"></div>
+										</div>
+										
+								       <div class="red_cricle">
+                                           <div id="red2"></div>
+										</div>!--->
+										
+							<div class="red_cc">	                			                	
+				        <div align="left" id="red2" style="width: 83px;height: 83px;border-radius: 50%;background-color: #DDDDDD"></div>
+                        </div>	
+                        <div class="green">
+                        <div align="right"id="green2" style="width: 83px;height: 83px;border-radius: 50%;background-color: #DDDDDD"></div>	
+				   
+							</div>	
+				
+				    
+									
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                               
+                               <!---<img src="../static/Card_C.png" width="100%"  >!--->
+                                <div id="card-img-overlay3">
+                                    
+                                    <div class="text-UserID">
+                                       <span id="UserIDC">Demo_01</span>
+                                    </div>
+
+                                    <div class="text-frequency">
+                                        <span id="frequencyC">0</span>
+                                    </div>
+
+                                    <div class="text-Acc">
+                                        <span id="AccC">0.XX</span>
+                                    </div>
+									<div class="text-State">
+										<!---<span id="show_state"></span>!--->
+									</div>
+                                   
+                                    <!---<div id="green"></div>
+                                    <div id="red"></div>!--->
+                                    
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                               
+                               <!---<img src="../static/Card_D.png" width="100%"  >!--->
+                                <div id="card-img-overlay4">
+                                    <div class="text-UserID">
+                                        <span id="UserIDD">Demo_02</span>
+                                    </div>
+
+                                    <div class="text-frequency">
+                                        <span id="frequencyD">0</span>
+                                    </div>
+
+                                    <div class="text-Acc">
+                                        <span id="AccD">0.XX</span>
+                                    </div>
+									<div class="text-State">
+										<!---<span id="show_state"></span>!--->
+									</div>
+                                   
+                                    <!---<div id="green"></div>
+                                    <div id="red"></div>!--->
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+               
+       	        <div class="container">
+				    <div class="row">
+                       <div class="col">
+
+                            <!---<p class="lead text-muted"><font color="#fff">這是一個結合智慧、效能與訓練的科技啞鈴頁面。您可以透過它知道你進行二頭肌訓練時，舉起啞鈴的次數並且告知您動作是否確實。</font> </p>!--->
+                                 
+                            <form class="form-signin">
+                                  <img class="mb-4" src="../static/muscle1.png" alt="" width="72" height="72">
+
+                                  <h1 class="h3 mb-3 font-weight-normal"><font color="#fff">輸入您的工號</font></h1>
+          
+                                  <div>
+                                      <input type="text" class="form-control" id="mqtt_text" name = "message" maxlength="6" onkeyup="value=value.replace(/[^\d]/g,'')" placeholder="UserID(6位數數字)" style="width: 300px;"/>
+          
+                                  <h1> </h1>
+                                  <button class="btn btn-lg btn-primary btn-block" id="mqtt_pub">Register</button>
+          
+                                  </div>
+            
+                                  <!---<p class="mt-5 mb-3 text-muted">&copy; 20190301-20190831</p>!--->
+          
+                            </form>
+
+                       </div>
+
+                       <div class="col">
+                           
+                            <div class="clock1">
+                                <input type="radio" name="timer" id="start" />
+                                <input type="radio" name="timer" id="stop" />
+                                <input type="radio" name="timer" id="reset" />
+                                
+                                <!-- Top Button -->
+                                <label class="btn_clock red" for="reset"></label>
+                                <span class="ring"></span>
+                                <div class="btn_clock"></div>
+                    
+                                <!-- Right Button -->
+                                <label class="btn_clock right blue" for="start"></label>   
+                                <div class="btn_clock right"></div>
+                    
+                                <!-- Left Button -->
+                                <label class="btn_clock left black" for="stop"></label>
+                                <div class="btn_clock left"></div>
+                    
+                                <!-- Clock -->
+                                <span class="axis tiny"></span>
+                                <span class="axis"></span>   
+                                <span class="second-hand"></span>
+                                <span class="clock-face twelve"></span>
+                                <span class="clock-face seconds second-1"></span>
+                                <span class="clock-face seconds second-2"></span>
+                                <span class="clock-face seconds second-3"></span>
+                                <span class="clock-face seconds second-4"></span>
+                                <span class="clock-face one"></span>
+                                <span class="clock-face seconds second-6"></span>
+                                <span class="clock-face seconds second-7"></span>
+                                <span class="clock-face seconds second-8"></span>
+                                <span class="clock-face seconds second-9"></span>
+                                <span class="clock-face two"></span>
+                                <span class="clock-face seconds second-11"></span>
+                                <span class="clock-face seconds second-12"></span>
+                                <span class="clock-face seconds second-13"></span>
+                                <span class="clock-face seconds second-14"></span>
+                                <span class="clock-face three"></span>
+                                <span class="clock-face seconds second-16"></span>
+                                <span class="clock-face seconds second-17"></span>
+                                <span class="clock-face seconds second-18"></span>
+                                <span class="clock-face seconds second-19"></span>
+                                <span class="clock-face four"></span>
+                                <span class="clock-face seconds second-21"></span>
+                                <span class="clock-face seconds second-22"></span>
+                                <span class="clock-face seconds second-23"></span>
+                                <span class="clock-face seconds second-24"></span>
+                                <span class="clock-face five"></span>
+                                <span class="clock-face seconds second-26"></span>
+                                <span class="clock-face seconds second-27"></span>
+                                <span class="clock-face seconds second-28"></span>
+                                <span class="clock-face seconds second-29"></span>
+                                <span class="clock-face six"></span>
+                                <span class="clock-face seconds second-31"></span>
+                                <span class="clock-face seconds second-32"></span>
+                                <span class="clock-face seconds second-33"></span>
+                                <span class="clock-face seconds second-34"></span>
+                                <span class="clock-face seven"></span>
+                                <span class="clock-face seconds second-36"></span>
+                                <span class="clock-face seconds second-37"></span>
+                                <span class="clock-face seconds second-38"></span>
+                                <span class="clock-face seconds second-39"></span>
+                                <span class="clock-face eight"></span>
+                                <span class="clock-face seconds second-41"></span>
+                                <span class="clock-face seconds second-42"></span>
+                                <span class="clock-face seconds second-43"></span>
+                                <span class="clock-face seconds second-44"></span>
+                                <span class="clock-face nine"></span>
+                                <span class="clock-face seconds second-46"></span>
+                                <span class="clock-face seconds second-47"></span>
+                                <span class="clock-face seconds second-48"></span>
+                                <span class="clock-face seconds second-49"></span>
+                                <span class="clock-face ten"></span>
+                                <span class="clock-face seconds second-51"></span>
+                                <span class="clock-face seconds second-52"></span>
+                                <span class="clock-face seconds second-53"></span>
+                                <span class="clock-face seconds second-54"></span>
+                                <span class="clock-face eleven"></span>
+                                <span class="clock-face seconds second-56"></span>
+                                <span class="clock-face seconds second-57"></span>
+                                <span class="clock-face seconds second-58"></span>
+                                <span class="clock-face seconds second-59"></span>
+                            </div>
+                            
+                            <font face="Calibri" size ="50" color="#fff">
+                                <p id="aaa" align=center>00:00.0</p>
+                            </font>
+                           
+                           
+                            <!--- clock_stytle.css !--->
+                            
+                         <div class="div_obj">
+                            <div class="ctn">
+					            <p align=center>
+							        <button id="startPause" onclick="startPause()" class="button b-red">Start</button>
+							     </p>
+                                <p align=center>
+							        <button id="resetBtn" onclick="resetBtn()" class="button b-blue">Reset</button>
+					            </p>
+                            </div>
+                           </div>   
+                       
+                </div>
+					</div>
+					
+					</div>
+             
+            <div align="center">
+				<font color="#2c3e50">
+					<span id="StateA"></span>
+					<span id="StateB"></span>
+					<span id="StateC"></span>
+					<span id="StateD"></span>
+				</font>
+			</div>
+
+            </main>
+            
+<script>
+    $(function() {
+
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('mqtt_message_A', function(data) {
+            var json = JSON.parse(data);
+            console.log(json)
+            $("#DeviceIDA").html(json['DeviceID']);
+            $("#UserIDA").html(json['UserID']);
+            $("#frequencyA").html(json['frequency']);
+            $("#AccA").html(json['Acc']);
+            $("#StateA").html(json['State']);
+            
+            var state = document.getElementById("StateA").innerHTML;
+            int_state = parseInt(state);
+            
+            
+            switch(int_state){
+
+                case 1:
+                   show_stateA_1();
+                   break;
+                case 2:
+                   show_stateA_2();
+                   break;
+                case 3:
+                   show_stateA_3();
+                   break;    
+            }
+            
+        });
+    });
+               
+               
+    
+  function show_stateA_1(){
+        var red = document.getElementById("red1");
+        var green = document.getElementById("green1");
+        green.style.backgroundColor="#DDDDDD";
+        red.style.backgroundColor="#DDDDDD";
+        var show_state = " ";
+        document.getElementById("show_stateA").innerHTML = show_state; 
+        return; 
+    }
+        
+    function show_stateA_2(){
+        var red = document.getElementById("red1");
+        var green = document.getElementById("green1");
+        green.style.backgroundColor="#DDDDDD";
+        red.style.backgroundColor="#DDDDDD";
+        var show_state = "屈舉角度不夠";
+        document.getElementById("show_stateA").innerHTML = show_state; 
+        return; 
+    }
+        
+    function show_stateA_3(){
+        var red = document.getElementById("red1");
+        var green = document.getElementById("green1");
+        green.style.backgroundColor="green";
+        red.style.backgroundColor="#DDDDDD";
+        var show_state = "動作有效完成";
+        document.getElementById("show_stateA").innerHTML = show_state; 
+        return; 
+    }    
+               
+               
+    </script>
+    
+    <script>
+    $(function() {
+
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('mqtt_message_B', function(data) {
+            var json = JSON.parse(data);
+            console.log(json)
+            $("#DeviceIDB").html(json['DeviceID']);
+            $("#UserIDB").html(json['UserID']);
+            $("#frequencyB").html(json['frequency']);
+            $("#AccB").html(json['Acc']);
+            $("#StateB").html(json['State']);
+            
+            var state = document.getElementById("StateB").innerHTML;
+            console.log(state);
+            
+            int_state = parseInt(state);
+            switch(int_state){
+                
+                case 1:
+                   show_stateB_1();
+                   break;
+                case 2:
+                   show_stateB_2();
+                   break;
+                case 3:
+                   show_stateB_3();
+                   break;    
+            }
+        });
+    });
+        
+
+        
+    function show_stateB_1(){
+        var red = document.getElementById("red2");
+        var green = document.getElementById("green2");
+        green.style.backgroundColor="#DDDDDD";
+        red.style.backgroundColor="#DDDDDD";
+        var show_state = "   ";
+        document.getElementById("show_stateB").innerHTML = show_state; 
+        return; 
+    }
+        
+    function show_stateB_2(){
+        var red = document.getElementById("red2");
+        var green = document.getElementById("green2");
+        green.style.backgroundColor="#DDDDDD";
+        red.style.backgroundColor="#DDDDDD";
+        var show_state = "屈舉角度不夠";
+        document.getElementById("show_stateB").innerHTML = show_state; 
+        return; 
+    }
+        
+    function show_stateB_3(){
+        var red = document.getElementById("red2");
+        var green = document.getElementById("green2");
+        green.style.backgroundColor="green";
+        red.style.backgroundColor="#DDDDDD";
+        var show_state = "動作有效完成";
+        document.getElementById("show_stateB").innerHTML = show_state; 
+        return; 
+    }    
+    </script>
+        
+
+           <!--- <script src="{{url_for('static', filename='js/mqtt_msg_A.js') }}"></script>
+            <script src="{{url_for('static', filename='js/mqtt_msg_B.js') }}"></script>!--->
+            <!---<script src="{{url_for('static', filename='js/mqtt_msg_C.js') }}"></script>
+            <script src="{{url_for('static', filename='js/mqtt_msg_D.js') }}"></script>!--->
+            <script src="{{url_for('static', filename='js/showtime.js') }}"></script>
+            <script src="{{url_for('static', filename='js/timer.js') }}"></script>
+            
+            
+
+	
+</body>
+</html>
+
+
